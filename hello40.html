@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular.js"></script>
+        <style>
+            .ng-invalid { border: 1px solid red; }
+            .ng-scope { border: 1px solid red; margin: 4px }
+        </style>
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+            <input ng-model="title" ng-disabled="true"><br>
+            <textarea ng-model="text"></textarea> <br/>
+            <pane title="{{title}}">{{ text }}</pane>
+        </div>
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest', ['$scope', '$timeout','$rootScope',
+                function($scope, $timeout, $rootScope) {
+                    $scope.title = 'zjc';
+                    $scope.text = 'This is the text of the pane element';
+                    $rootScope.showScope = function(e) {
+                        console.log(angular.element(e.target).scope());
+                    }
+                    $scope.showMe= function() {
+                     console.log(1);
+                    }
+                    $scope.showScope = function(e) {
+                        console.log(angular.element(e.target).scope());
+                    }
+                }
+            ]);
+
+            /*把页面中指令的内容（子元素），作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('pane', function(){
+                return {
+                    restrict: 'E',
+                    transclude: true,
+                    replace:true,
+                    scope: { title:'@' },
+                    template: '<div style="border: 1px solid black;">' +
+                    '<div style="background-color: gray">{{title}}</div>' +
+                    '<div ng-transclude><a ng-click="$parent.showScope($event)">show scope</a></div>' +
+                    '</div>',
+                    link: function(scope, element) {
+                        scope.isolate = "I'm the isolate scope";
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

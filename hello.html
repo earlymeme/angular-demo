@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body ng-app="xmpl">
+
+        <div ng-controller="XmplController">
+            {{ greeting }}
+            <expander class='expander' expander-title='title'>
+                {{text}}
+            </expander>
+            <div example-directive></div>
+            <div record-btn="{translateCallback:translateCallback}"></div>
+            <ul repeater="6">
+                <li>哈哈哈哈</li>
+            </ul>
+            <ul repeater="2">
+                <li>哈哈哈哈</li>
+            </ul>
+
+            <input custom-focus="showOpt.ifNewTodo" type="text" placeholder="输入待处理事项" autocomplete=false>
+
+
+            <my-dialog>Check out the contents, {{name31231}}!</my-dialog>
+        </div>
+
+        <hello>
+            <br/>
+            <span>原始的内容，</span><br/>
+            <span>还会在这里。</span>
+        </hello>
+        <hello123>
+        </hello123>
+
+        <my-tabs>
+            <my-pane title="Hello">
+                <p>Lorem ipsum dolor sit amet</p>
+            </my-pane>
+            <my-pane title="World">
+                <em>Mauris elementum elementum enim at suscipit.</em>
+                <p><a href ng-click="i = i + 1">counter: {{i || 0}}</a></p>
+            </my-pane>
+        </my-tabs>
+        <my-isolated-scope></my-isolated-scope>
+        <!-- build:js({.tmp,src}) scripts/vendor0.js -->
+        <script src="lib/zepto.min.js"></script>
+        <!-- bower:js -->
+        <script src="lib/angular/angular.js"></script>
+        <script src="lib/angular-ui-router/release/angular-ui-router.js"></script>
+        <script src="lib/fastclick/lib/fastclick.js"></script>
+        <script src="lib/angular-animate/angular-animate.js"></script>
+        <!-- endbower -->
+        <!-- endbuild -->
+        <div ng-controller="CustomersController">
+            <div isolated-scope-with-controller datasource="customers" counter="counter" add="addCustomer(name)"></div>
+        </div>
+        <script>
+            angular.module('xmpl.service', [])
+                    .factory('greeter', function($http, $q) {
+                        var ss = 'hhh';
+                        return {
+                            salutation: 'Hello',
+                            localize: function(localization) {
+                                this.salutation = localization.salutation;
+                                console.log(ss);
+                            },
+                            greet: function(name) {
+                                return this.salutation + ' ' + name + '!';
+                            }
+                        }
+                    })
+                    .service('hell', function() {
+                        this.hello = 'say hello';
+                    })
+                    .value('user', {
+                        load: function(name) {
+                            this.name = name;
+                        }
+                    });
+            angular.module('xmpl.directive', []).directive('myDialog', function() {
+                return {
+                    restrict: 'E',
+                    transclude: true,
+                    scope: {},
+                    template: '<div class="alert" ng-transclude></div>',
+                    link: function(scope) {
+                        scope.name = 'Jeff';
+                    }
+                };
+            }).directive('someDirective', function() {
+                return {
+                    restrict: 'EA',
+                    scope: {
+                        name: '=',
+                        color: '@'
+                    },
+                    template: '{{name}}: {{color}}',
+                    link: function(scope, element, attrs) {
+                        scope.color = '12321';
+                        console.log(scope);
+                    }
+                };
+            }).directive('customFocus', function($timeout, $parse, $window) {
+                // 自动 focus
+                return {
+                    restrict: 'A',
+                    link: function(scope, element, attrs) {
+                        var model = $parse(attrs.customFocus);
+
+                        scope.$watch(model, function(value) {
+                            if (value === true) {
+                                focusInput();
+                            }
+                        });
+
+                        var focusInput = function() {
+                            // element[0].focus();
+                            $timeout(function() {
+                                element[0].focus();
+                            }, 0, false);
+                        };
+
+                    }
+
+                };
+            }).directive('recordBtn', function($parse) {
+                return {
+                    restrict: 'EA',
+                    template: '<button class="voice-btn" ><!-- 按住按钮时加上 active --> <span class="ctn"> <i class="dot"></i>按住说话 </span> <span class="shadow"><i></i></span> </button>',
+                    transclude: true,
+                    replace: true,
+                    link: function(scope, element, attrs) {
+                        var options = scope.$eval(attrs.recordBtn) || {};
+                        var translateCallback = options.translateCallback;
+                        var model = $parse(attrs.recordBtn);
+                        console.log('--------------');
+                        console.log(translateCallback);
+                    }
+                };
+            }).directive('hello', function() {
+                return {
+                    restrict: 'E',
+                    template: '<div>Hi there <span ng-transclude></span></div>',
+                    transclude: true,
+                    replace: true
+                };
+            }).directive('expander', function() {
+                return {
+                    restrict: 'EA',
+                    replace: true,
+                    transclude: true,
+                    scope: {
+                        title: '=expanderTitle'
+                    },
+                    template: '<div>'
+                    + '<div class="title" ng-click="toggle()">{{title}}</div>'
+                    + '<div class="body" ng-show="showMe" ng-transclude></div>'
+                    + '</div>',
+                    link: function(scope, element, attrs) {
+                        scope.showMe = false;
+                        scope.toggle = function toggle() {
+                            scope.showMe = !scope.showMe;
+                        }
+                    }
+                }
+            }).directive('repeater', function($document) {
+                return {
+                    restrict: 'A',
+                    compile: function($element, attrs) {
+                        var template = $element.children().clone();
+                        for (var i = 0; i < attrs.repeater - 1; i++) {
+                            $element.append(template.clone());
+                        }
+                    }
+                }
+            }).directive('myIsolatedScope', function() {
+                return {
+                    scope: {},
+                    template: 'Name: {{customer.name}} Street: {{customer.street}}'
+                };
+            }).directive('exampleDirective', function() {
+                return {
+                    restrict: 'EA',
+                    template: '<div>Hello {{number}}!</div>',
+                    replace: true,
+                    controller: function($scope, $element) {
+                        $scope.number = $scope.number + "22222 ";
+                    },
+                    link: function(scope, el, attr) {
+                        scope.number = scope.number + "33333 ";
+                    }/*,
+                     compile: function(element, attributes) {
+                     console.log('sss');
+                     return {
+                     pre: function preLink(scope, element, attributes) {
+                     scope.number = scope.number + "44444 ";
+                     },
+                     post: function postLink(scope, element, attributes) {
+                     scope.number = scope.number + "55555 ";
+                     }
+                     };
+                     }*/
+                }
+            }).directive('myTabs', function() {
+                        return {
+                            restrict: 'E',
+                            transclude: true,
+                            controller: ['$scope', function($scope) {
+                                var panes = $scope.panes = [];
+
+                                $scope.select = function(pane) {
+                                    angular.forEach(panes, function(pane) {
+                                        pane.selected = false;
+                                    });
+                                    pane.selected = true;
+                                };
+
+                                this.addPane = function(pane) {
+                                    if (panes.length === 0) {
+                                        $scope.select(pane);
+                                    }
+                                    panes.push(pane);
+                                };
+                            }],
+                            templateUrl: 'my-tabs.html'
+                        };
+                    })
+                    .directive('myPane', function() {
+                        return {
+                            require: '^^myTabs',
+                            restrict: 'E',
+                            transclude: true,
+                            scope: {
+                                title: '@'
+                            },
+                            link: function(scope, element, attrs, tabsCtrl) {
+                                tabsCtrl.addPane(scope);
+                            },
+                            templateUrl: 'my-pane.html'
+                        };
+                    })
+                    .directive('isolatedScopeWithController', function() {
+                        return {
+                            restrict: 'EA',
+                            scope: {
+                                counter: '=',
+                                customers: '=datasource',
+                                add: '&'
+                            },
+                            controller: function($scope) {
+                                $scope.addCustomer = function(name) {
+                                    //Call external scope's function
+                                    var name = 'New Customer Added by Directive';
+                                    $scope.add({name: name});
+
+                                    //Add new customer to directive scope
+                                    $scope.customers.push({
+                                        name: name,
+                                        street: '11233 Main St.'
+                                    });
+                                };
+                            },
+                            template: '<button ng-click="addCustomer()">add Customer</button><ul>' +
+                            '<li ng-repeat="cust in customers">{{ cust.name }}{{cust.street}}</li></ul>'
+                        };
+                    });
+
+
+            angular.module('xmpl.value', []).value('pageCount1', 8).decorator('pageCount1', function($delegate) {
+                return $delegate + 1;
+            });
+            angular.module('xmpl.const', []).constant('pageCount', 7);
+
+            angular.module('xmpl.filter', []);
+            var app = angular.module('xmpl', ['xmpl.service', 'xmpl.directive', 'xmpl.filter', 'xmpl.value', 'xmpl.const']);
+            app.config(function(pageCount) {
+                console.log(pageCount);
+            }).run(function($templateCache, greeter, user, hell, pageCount1, pageCount) {
+                        console.log(pageCount1);
+                        console.warn(pageCount);
+                        // This is effectively part of the main method initialization code
+                        greeter.localize({
+                            salutation: 'Bonjour'
+                        });
+                        user.load('World');
+                        console.log(hell.hello);
+                        $templateCache.put('templateId.html', 'This is the content of the template');
+                    })
+                    .controller('XmplController', function($scope, greeter, user) {
+                        $scope.greeting = greeter.greet(user.name);
+                        $scope.title = '点击展开';
+                        $scope.text = '这里是内部的内容。';
+                        $scope.number = '1111 ';
+                        $scope.showOpt = {
+                            ifNewTodo: true
+                        };
+                        $scope.name = 'sad';
+                        $scope.color = 'red';
+
+                        $scope.name31231 = 'Tobias';
+
+                    })
+                    .controller('CustomersController', ['$scope', function($scope) {
+                        var counter = 0;
+                        $scope.counter = 0;
+                        $scope.customer = {
+                            name: 'David',
+                            street: '1234 Anywhere St.'
+                        };
+
+                        $scope.customers = [];
+
+                        $scope.addCustomer = function(name) {
+                            counter++;
+                            $scope.counter++;
+                            $scope.customers.push({
+                                name: (name) ? name : 'New Customer' + counter,
+                                street: counter + ' Cedar Point St.'
+                            });
+                        };
+
+                        $scope.changeData = function() {
+                            counter++;
+                            $scope.counter++;
+                            $scope.customer = {
+                                name: 'James',
+                                street: counter + ' Cedar Point St.'
+                            };
+                        };
+                    }])
+                    .directive('hello123', function() {
+                        return {
+                            restrict: 'E',
+                            template: '<div>Hi there123</div>',
+                            replace: true
+                        };
+                    });
+        </script>
+    </body>
+</html>

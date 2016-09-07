@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AngularJS</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body>
+        <div ng-app="app">
+            <div ng-controller="MainCtrl">{{ name }}</div>
+        </div>
+        <script>
+            angular.module('app', []);
+
+            angular.module('app')
+                    .service('myService', function () {
+                        var self = this;
+                        self.getName = function () {
+                            return 'John';
+                        };
+                    });
+            angular.module('app')
+                    .config(function ($provide) {
+                        $provide.decorator('myService', function ($delegate) {
+                            return {
+                                getName: function () {
+                                    return $delegate.getName().toUpperCase();
+                                }
+                            };
+                        });
+                    });
+            angular.module('app')
+                    .controller('MainCtrl', function ($scope, myService) {
+                        $scope.name = myService.getName();
+                    });
+        </script>
+    </body>
+
+</html>
+
+

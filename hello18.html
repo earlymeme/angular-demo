@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="Demo">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/zepto.min.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="CountriesCountroller" class="panel panel-default">
+            <div>父scope：
+                <div>Say：{{user.name}}<br>改变父scope的name：<input type="text" value="" ng-model="user.name"/></div>
+            </div>
+            <div>隔离scope：
+                <div isolated-directive user="user"></div>
+            </div>
+            <div>隔离scope（使用{{name}}）：
+                <div isolated-directive user="user"></div>
+            </div>
+        </div>
+        <script>
+            angular.module('Demo', [])
+                    .controller('CountriesCountroller', function($scope) {
+                        $scope.user = {
+                            name: 'hello',
+                            id: 1
+                        };
+                    })
+                    .directive("isolatedDirective", function() {
+                        return {
+                            scope: {
+                                user: "="
+                            },
+                            template: 'Say：{{user.name}} <br>改变隔离scope的name：<input type="buttom" value="" ng-model="user.name"/>'
+                        }
+                    });
+        </script>
+    </body>
+</html>

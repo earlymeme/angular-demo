@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>$watch() && $observe()</title>
+
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+
+    <body ng-controller="MyController">
+        <div class="left">
+            <h3>使用$watch()和$observe()监测属性</h3>
+            <button ng-click="changeAttr()">点击查看变化</button>
+            <h4></h4>
+            <div directive1 attr1="{{prop1}}-test" attr6="{{1+count}}" attr7="count"></div>
+            <!-- <div directive2 attr1="{{prop1}}-test" attr6="{{1+count}}" attr7="count"></div> -->
+        </div>
+        <div class="right">
+            <h3>这里可以查看显示结果或者在控制台中查看结果:</h3>
+        </div>
+        <div class="result">
+        <!-- 我的结论
+        $watch 不能监听attr中属性的值带有{{}}的属性，例如这里的iAttr.attr6,因为在执行$watch时，它的值已经被$interpolate过了，解析成具体的值了
+            使用隔离的scope时
+                    @{{父scope}} 可以使用$watch和$observe('属性名string')监听，
+                    =父scope 使用$watch监听 -->
+                    
+        </div>
+        <script type="text/javascript">
+            (function() {
+                angular.module("MyApp", [])
+                        .controller("MyController", MyController)
+                        .directive("directive1", directive1)
+                        .directive("directive2", directive2);
+
+                // MyController.$inject = ['$scope'];
+//                directive1.$inject = ['$parse'];
+//                directive2.$inject = ['$parse'];
+
+                function MyController($scope) {
+                    $scope.prop0 = 0;
+                    $scope.prop1 = "test-prop1";
+                    $scope.prop2 = "test-prop2";
+                    $scope.count = 1;
+                    $scope.changeAttr = changeAttr;
+
+                    function changeAttr() {
+                        $scope.count++;
+                    }
+                }
+
+                // 这里是为了输出一些结果,与本例子关系不大
+
+                function printLog(ele, title, msg) {
+                    angular.element(ele).parent().next().append('<p>' + title + msg + '</p>');
+                }
+
+                // 第一个指令
+
+                function directive1() {
+                    var directive = {
+                        compile: compile
+                    };
+                    return directive;
+
+                    function compile(tEle, tAttr) {
+                        var str = '';
+                        angular.forEach(tAttr, function(value, key) {
+                            console.log(key, value);
+                            str += value + ' ';
+                        });
+                        printLog(tEle, "指令1 编译之前 元素上面的属性", "这个结果需要在控制台中查看,不然在页面上会被解析!");
+                        return function link(scope, iEle, iAttr) {
+                            var str = '';
+                            angular.forEach(iAttr, function(value, key) {
+                                console.log(key, value);
+                                str += value + ' ';
+                            });
+                            scope.$watch(iAttr.attr1, function(newValue) {
+                                printLog(iEle, "指令1 $watch 监测属性:iAttr.attr1 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            scope.$watch(iAttr.attr6, function(newValue) {
+                                printLog(iEle, "指令1 $watch 监测属性:iAttr.attr6 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            scope.$watch(iAttr.attr7, function(newValue) {
+                                printLog(iEle, "指令1 $watch 监测属性:iAttr.attr7 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+
+
+                            iAttr.$observe('attr1', function(newValue) {
+                                printLog(iEle, "指令1 $observe 监测属性:iAttr.attr1 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            iAttr.$observe('attr6', function(newValue) {
+                                printLog(iEle, "指令1 $observe 监测属性:iAttr.attr6 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+
+
+                        }
+                    }
+                }
+
+                // 第二个指令
+                function directive2($parse) {
+                    var directive = {
+                        scope: {
+                            attr1: '@',
+                            attr6: '@',
+                            attr7: '='
+                        },
+                        compile: compile
+                    };
+                    return directive;
+
+                    function compile(tEle, tAttr) {
+                        return function link(scope, iEle, iAttr) {
+
+                            scope.$watch(scope.attr1, function(newValue) {
+                                printLog(iEle, "指令2 $watch 监测属性:iAttr.attr1 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+
+                            scope.$watch(scope.attr6, function(newValue) {
+                                printLog(iEle, "指令2 $watch 监测属性:iAttr.attr6 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            scope.$watch(scope.attr7, function(newValue) {
+                                printLog(iEle, "指令2 $watch 监测属性:iAttr.attr7 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+
+
+                            iAttr.$observe('attr1', function(newValue) {
+                                printLog(iEle, "指令2 $observe 监测属性:iAttr.attr1 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            iAttr.$observe('attr6', function(newValue) {
+                                printLog(iEle, "指令2 $observe 监测属性:iAttr.attr6 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+                            iAttr.$observe('attr7', function(newValue) {
+                                printLog(iEle, "指令2 $observe 监测属性:iAttr.attr7 检测结果: ", newValue);
+                                console.log(newValue);
+                            });
+
+                        }
+                    }
+                }
+
+
+            })();
+
+
+        </script>
+    </body>
+
+</html>

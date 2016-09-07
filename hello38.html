@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular.js"></script>
+        <style>
+            .item {
+
+            }
+        </style>
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+            <label>Salutation: <input type="text" ng-model="salutation"></label><br>
+            <label>Name: <input type="text" ng-model="name"></label><br>
+            <pre ng-bind-template="{{salutation}} {{name}}!"></pre>
+        </div>
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest', ['$scope', '$timeout',
+                function($scope, $timeout) {
+                    $scope.salutation = 'Hello';
+                    $scope.name = 'World';
+                }
+            ]);
+
+        </script>
+    </body>
+</html>

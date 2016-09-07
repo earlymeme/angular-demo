@@ -1,0 +1,55 @@
+<!doctype html>
+<html ng-app="Demo">
+    <head>
+        <meta charset="utf-8"/>
+        <title>
+            AngularJS
+        </title>
+        <script src="lib/angular.js"></script>
+    </head>
+    <body>
+        <div ng-controller="MyCtrl">
+            <!--{{foo}}
+            <my-component isolated-expression-foo="updateFoo(newFoo)">
+            </my-component>-->
+            <div outer-directive ctrl-fn="ctrlFn()"></div>
+        </div>
+        <script type="text/javascript">
+            var app = angular.module("Demo", []);
+            angular.module("Demo").controller('MyCtrl', ['$scope', function($scope) {
+               /* $scope.updateFoo = function(newFoo) {
+                    $scope.foo = newFoo;
+                }*/
+                $scope.ctrlFn = function() {
+                    console.log('called');
+                };
+            }])/*.directive('myComponent', function() {
+                return {
+                    restrict:'E',
+                    scope: {
+                        isolatedExpressionFoo: '&'
+                    },
+                    template:'<div> <input ng-model="isolatedFoo"> <button class="btn" ng-click="isolatedExpressionFoo({newFoo:isolatedFoo})">Submit</button></div>'
+                };
+            })*/.directive('outerDirective', function() {
+                return {
+                    restrict: 'A',
+                    scope: {
+                        ctrlFn : '&'
+                    },
+//                    controller: 'MyCtrl',
+                    template:
+                    '<div>' +
+                    '<button ng-click="outerFunction()">Call Function from Outer Directive</button>' +
+                    '</div>',
+                    link: function(scope, element, attributes) {
+                        scope.outerFunction = function() {
+                            console.log('outer function calls controller function')
+                            scope.ctrlFn();
+                        };
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

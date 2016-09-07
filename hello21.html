@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html ng-app='PonyDeli' ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller='foodCtrl'><p note='"You just bought some " + type'></p>
+        <p note-equiv='"You just bought some " + type'></p></div>
+        <script>
+            var deli = angular.module('PonyDeli', []);
+
+            deli.controller('foodCtrl', function ($scope) {
+                $scope.type = 'vegetables';
+            });
+
+            deli.directive('note', function () {
+                return {
+                    template: '{{note()}}',
+                    scope: {
+                        note: '&'
+                    },
+                    link: function (scope, element, attrs) {
+                        console.log(scope);
+                    }
+                };
+            });
+
+            // this is what the `note` directive above ends up doing
+            deli.directive('noteEquiv', function ($parse) {
+                return {
+                    template: '{{note()}}',
+                    scope: {},
+                    link: function (scope, element, attrs) {
+                        // https://github.com/angular/angular.js/blob/caed2dfe4feeac5d19ecea2dbb1456b7fde21e6d/src/ng/compile.js#L1463-L1466
+                        var parentGet = $parse(attrs.noteEquiv);
+
+                        scope.note = function (locals) {
+                            return parentGet(scope.$parent, locals);
+                        };
+                    }
+                };
+            });
+(Function.prototype.bind.apply(function(a, b) {
+    this.name = 'zkc';
+    console.log(a);
+    console.log(this);
+    console.log(b);
+    debugger 
+}, [{
+    nam1e3: 'ssss'
+}, 2, 3]))();
+new (Function.prototype.bind.apply(function(a, b) {
+    this.name = 'zkc';
+    console.log(a);
+    console.log(this);
+    console.log(b);
+    debugger 
+}, [{
+    nam1e3: 'ssss'
+}, 2, 3]))();
+
+
+function fun(){
+    debugger
+    this.name = 'zjc';
+    console.log(this.name333)
+}
+
+boundFun = fun.bind({name333:123});
+
+fun();
+boundFun();
+var foo = {
+    x: 3
+}
+ 
+var bar = function(){
+    console.log(this.x);
+}
+ 
+bar(); 
+// undefined
+ 
+var boundFunc = bar.bind(foo);
+ 
+boundFunc(); 
+        </script>
+    </body>
+</html>

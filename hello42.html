@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <!–[if lt IE 9]>
+        <script src="lib/es5-shim.js"></script>
+        <script src="lib/json2.js"></script>
+        <![endif]–>
+        <script src="lib/angular.js"></script>
+        <style>
+            .ng-invalid {
+                border: 1px solid red;
+            }
+
+            .ng-scope {
+                border: 1px solid red;
+                margin: 4px
+            }
+        </style>
+    </head>
+    <body>
+        <div ng-app="transclude">
+            <div ng-controller="Ctrl">
+                <input ng-model="title"><br>
+                <textarea ng-model="text"></textarea> <br/>
+                <pane title="{{title}}">{{text}}</pane>
+            </div>
+        </div>
+        <script>
+            angular.module('transclude', [])
+                    .controller('Ctrl', ['$scope', '$timeout','$rootScope',
+                        function($scope, $timeout, $rootScope) {
+                            $scope.title = 'My Title';
+                            $scope.text = 'This is the text of the pane element';
+                            debugger
+                            $rootScope.showScope = function(e) {
+                                debugger
+                                console.log(angular.element(e.srcElement).scope());
+                            }
+                        }
+                    ])
+                    .directive('pane', function() {
+                        return {
+                            restrict: 'E',
+                            transclude: true,
+                            scope: {title: '@'},
+                            template: '<div style="border: 1px solid black;">' +
+                            '<div style="background-color: gray">{{title}}</div>' +
+                            '<div ng-transclude><a ng-click="$parent.showScope($event)">show scope</a></div>' +
+                            '</div>',
+                            link: function(scope, element) {
+                                debugger
+                                scope.isolate = "I'm the isolate scope";
+                            }
+                        };
+                    });
+            // Click "show scope" to see the isolate scope in the log,
+            // which does not prototypically inherit from the parent
+            // scope (__proto__ references Object).
+            // $$nextSibling is the transcluded scope, which
+            // prototypically inherits from the parent scope
+            // (__proto__ references the parent scope).
+            // In both scopes, $parent references the parent scope.
+        </script>
+    </body>
+</html>

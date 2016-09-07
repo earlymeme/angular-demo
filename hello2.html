@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset=utf-8/>
+        <title>JS Bin</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body ng-controller="MainCtrl">
+        <foo name="Angular Tips" ></foo>
+        <foo name="Angular Tips123" ></foo>
+        <script>
+            /*http://angular-tips.com/blog/2013/09/experiment-decorating-directives/*/
+            var app = angular.module('app', []);
+
+            app.controller("MainCtrl", function($scope) {
+            });
+
+            app.directive("foo", function() {
+                return {
+                    restrict: 'E',
+                    scope: {
+                        name: "@"
+                    },
+                    replace: true,
+                    template: '<div ng-click="clickMe(name)">Hello, {{name}}</div>',
+                    compile: function(tElement, tAttrs) {
+                        tElement.append('<div>Added in compile</div>');
+
+                        return function(scope, element, attrs) {
+                            if (angular.isDefined(attrs.name)) {
+                                attrs.name = attrs.name + "!";
+                            }
+                            scope.clickMe = function(name) {
+                                console.log(name);
+                            }
+                        };
+                    }
+                };
+            });
+
+            app.config(function($provide) {
+                $provide.decorator('fooDirective', function($delegate) {
+                    var directive = $delegate[0];
+
+                    var compile = directive.compile;
+
+                    directive.compile = function(tElement, tAttrs) {
+                        var link = compile.apply(this, arguments);
+                        tElement.append('<div>Added in the decorator</div>');
+                        return function(scope, elem, attrs) {
+                            link.apply(this, arguments);
+                            // We can extend the link function here
+                        };
+                    };
+
+                    return $delegate;
+                });
+            });
+        </script>
+    </body>
+</html>

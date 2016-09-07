@@ -1,0 +1,35 @@
+<!doctype html>
+<html ng-app="Demo">
+    <head>
+        <meta charset="utf-8"/>
+        <title>
+            AngularJS
+        </title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body>
+        <div ng-controller="MyCtrl">
+            <map set-fn="setDirectiveFn(theDirFn)"></map>
+            <button ng-click="directiveFn()">call directive function</button>
+        </div>
+        <script type="text/javascript">
+            var app = angular.module("Demo", []);
+            angular.module("Demo").controller('MyCtrl', ['$scope', function($scope) {
+                $scope.setDirectiveFn = function(directiveFn) {
+                    $scope.directiveFn = directiveFn;
+                };
+            }]).directive('map', function() {
+                return {
+                    restrict: 'E',
+                    scope: {setFn: '&'},
+                    link: function(scope, element, attrs) {
+                        scope.updateMap = function() {
+                            console.log('inside updateMap()');
+                        }
+                        scope.setFn({theDirFn: scope.updateMap});
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

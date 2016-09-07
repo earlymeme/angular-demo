@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <!–[if lt IE 9]>
+        <script src="lib/es5-shim.js"></script>
+        <script src="lib/json2.js"></script>
+        <![endif]–>
+        <script src="lib/angular.js"></script>
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+
+        </div>
+        <script>
+            function getData($timeout, $q) {
+                return function() {
+                    var defer = $q.defer()
+
+                    // simulated async function
+                    $timeout(function() {
+                        defer.resolve({name:1});
+                    }, 2000);
+
+                    return defer.promise;
+                }
+            }
+
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest', ['$scope', '$timeout','$rootScope',
+                function($scope, $timeout, $rootScope) {
+
+                }
+            ]).run(function(getData) {
+                var promise = getData();
+                promise.then(function(val) {
+                    console.log(val);
+                });
+            }).factory('getData',getData);
+
+        </script>
+    </body>
+</html>

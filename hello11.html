@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html ng-app="plunker">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>AngularJS Plunker</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+
+    <body ng-controller="MainCtrl as vm">
+        Directive where I passed the data:<br/>
+        <my-directive click-fn="vm.someFunction()"></my-directive>
+
+        <br/>
+
+        Directive where the property is not set (nothing should be visible):<br />
+        <my-directive></my-directive>
+
+        <script>
+            angular.module('plunker', [])
+                    .controller('MainCtrl', function(){
+                        var vm = this;
+
+                        vm.someFunction = function(){
+                            console.log('Hi');
+                        };
+                    })
+                    .directive('myDirective', function() {
+                        return {
+                            restrict: 'E',
+                            scope: {
+                                data: '=',
+                                clickFn: '&'
+                            },
+                            template: '<div ng-show="isFn" style="border: 1px solid; padding:5px"><a href="#" ng-click="clickFn()">Click me</a></div>',
+                            link: function($scope, iElem, iAttr){
+                                console.log($scope.clickFn === "vm.someFunction()");//true
+                                $scope.isFn = angular.isUndefined(iAttr.clickFn) === false;
+                            }
+                        };
+                    });
+        </script>
+    </body>
+
+</html>
+
+

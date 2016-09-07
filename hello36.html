@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+            <input type="text" drop-panel />
+    This is some stuff under the panel  
+        </div>  
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest',['$scope','$timeout',  
+              function($scope, $timeout) {  
+                  
+              }  
+          ]);
+            
+            /*transclude: 'element'
+            把页面中指令所在的元素，作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('dropPanel', function(){
+              return {
+                transclude: 'element',
+                replace: true,
+                template: '<div class=\'drop-panel\'><span ng-transclude></span>  <div class=\'drop-panel-el\'>    This is some panel content  </div></div>  ',
+                link: function(scope, el){
+                  var input = el.find('input[drop-panel]');
+
+                  input.focus(function(){
+                    el.addClass('is-active');
+                  });
+
+                  input.blur(function(){
+                    el.removeClass('is-active');
+                  });
+                }
+              }
+            });
+        </script>
+    </body>
+</html>

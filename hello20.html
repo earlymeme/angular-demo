@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html ng-app="Demo" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="parentController">
+            <button-bar>
+                <button class="primary" ng-click="onPrimary1Click()">{{primary1Label}}</button>
+                <button class="primary">Primary2</button>
+                <button class="secondary">Secondary1</button>
+            </button-bar>
+        </div>
+        <script>
+            var testapp = angular.module('Demo', []);
+            testapp.controller('parentController', ['$scope', '$window', function($scope, $window) {
+                $scope.primary1Label = 'Prime1';
+                $scope.onPrimary1Click = function() {
+                    alert('Primary 1 clicked');
+                }
+            }]);
+            /*equal to */
+            /*testapp.controller('parentController', function($scope, $window) {
+                $scope.primary1Label = 'Prime1';
+                $scope.onPrimary1Click = function() {
+                    alert('Primary 1 clicked');
+                }
+            });*/
+            testapp.directive('primary', function() {
+                return {
+                    restrict: 'C',
+                    link: function(scope, element, attrs) {
+                        element.addClass('btn btn-primary');
+                    }
+                }
+            });
+            testapp.directive('secondary', function() {
+                return {
+                    restrict: 'C',
+                    link: function(scope, element, attrs) {
+                        element.addClass('btn');
+                    }
+                }
+            });
+            testapp.directive('buttonBar', function() {
+                return {
+                    restrict: 'EA',
+                    template: '<div class="span4 well clearfix"><div class="primary-block pull-right"></div><div class="secondary-block"></div></div>',
+                    replace: true,
+                    transclude: 'element',
+                    compile: function(elem, attrs, transcludeFn) {
+                        return function (scope, element, attrs) {
+                            debugger
+                            transcludeFn(scope, function(clone) {
+                                debugger
+                                var primaryBlock = elem.find('div.primary-block');
+                                var secondaryBlock = elem.find('div.secondary-block');
+                                var transcludedButtons = clone.filter(':button');
+                                angular.forEach(transcludedButtons, function(e) {
+                                    if (angular.element(e).hasClass('primary')) {
+                                        primaryBlock.append(e);
+                                    } else if (angular.element(e).hasClass('secondary')) {
+                                        secondaryBlock.append(e);
+                                    }
+                                });
+                            });
+                        };
+                    }/*,
+                    controller: ['$scope', '$element', '$transclude', function ($scope, $element, $transclude) {
+                        $transclude(function(clone) {
+                            var primaryBlock = $element.find('div.primary-block');
+                            var secondaryBlock = $element.find('div.secondary-block');
+                            var transcludedButtons = clone.filter(':button');
+                            angular.forEach(transcludedButtons, function(e) {
+                                if (angular.element(e).hasClass('primary')) {
+                                    primaryBlock.append(e);
+                                } else if (angular.element(e).hasClass('secondary')) {
+                                    secondaryBlock.append(e);
+                                }
+                            });
+                        });
+                    }]*/
+                };
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset=utf-8/>
+        <title></title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body ng-controller="myController">
+        <div ng-controller="myController">
+            <div>父scope：
+                <div>Say：{{value}}</div>
+            </div>
+            <div>隔离scope：
+                <div isolated-directive action="click123()" change-age=""></div>
+            </div>
+
+
+            <div class="my-info">我的名字是：<span ng-bind="name"></span>
+                <!-- 使用"ng-bind"防止网络状态不佳时出现没有被赋值表达式   -->
+                <br/>我的年龄是：<span ng-bind="age"></span>
+                <my-directive></my-directive>
+            </div>
+            <script>
+                var app = angular.module('app', []);
+app.factory('random', [function() {
+        function random(n) {
+
+            var rnd = "";
+
+            for (var i = 0; i < n; i++) {
+                rnd += Math.floor(Math.random() * 10);
+            }
+
+            return rnd;
+        }
+
+        return random;
+    }])
+                app.controller("myController", function($scope,random) {
+                    $scope.name = "dreamapple";
+                    $scope.age = 20;
+                    //J2 创建一个方法，修改我们创建的对象的年龄
+                    $scope.changeAge = function() {
+                        $scope.age = 22;
+                    }
+
+
+                    $scope.value = "hello world";
+                    $scope.click123 = function() {
+                        $scope.value = Math.random();
+                    };
+                    console.log(random.fn);
+                }).provider('theProviderName', { 
+                    $get: function() { return this; } 
+                })
+                .directive("isolatedDirective", function(random) {
+                    random.fn = 1233;
+                    console.log(random(12));
+                    return {
+                        scope: {
+                            action: "&",
+                            changeAge:'&'
+                        },
+                        // replace:true,
+                        template: '<input type="button" value="在directive中执行父scope定义的方法" ng-click="action()"/>',
+                        link:function(scope){
+                                    console.log(scope)
+                        }
+                    }
+                }).directive("myDirective", function() {
+                    var obj = {
+                        //J4   指令的声明模式为 "AE" 属性和元素
+                        restrict: "AE",
+                        //J5   指令继承父作用域的属性和方法
+                        scope: true,
+                        replace: true,
+                        template: "<div class='my-directive'>" +
+                        "<h3>下面部分是我们创建的指令生成的</h3>" +
+                        "我的名字是：<span ng-bind='name'></span><br/>" +
+                        "我的年龄是：<span ng-bind='age'></span>" +
+                        "<input type='text' ng-model='name'>" +
+                        " </div>",
+                        link:function(scope,element,attrs) {
+                            console.log(scope);
+                        }
+                    }
+                    return obj;
+                });
+            </script>
+    </body>
+</html>

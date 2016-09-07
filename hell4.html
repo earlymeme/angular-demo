@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset=utf-8/>
+        <title>JS Bin</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body ng-controller="MainCtrl">
+        <my-add-things fn="add(x, y)"></my-add-things>
+        <script>
+            angular.module("app", []).controller("MainCtrl", function($scope) {
+                $scope.add = function(x, y) {
+                    return x + y;
+                };
+            }).directive("myAddThings", function() {
+                return {
+                    restrict: "E",
+                    template: "<div>{{result}}</div>",
+                    scope: {
+                        localFn: "&fn"
+                    },
+                    link: function(scope) {
+                        scope.result = scope.localFn({x: 1, y: 2});
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

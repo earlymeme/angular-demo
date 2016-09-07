@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html id="ng-app" ng-app="app">
+
+    <head>
+        <script src="lib/angular/angular.js"></script>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+
+    <body ng-controller="demoCtr as demo">
+        <div ng-form="form" name="form" class="form-horizontal">
+            <pre>{{form.age.$error | json}}</pre>
+            <pre>data: {{demo.data |json }}</pre>
+            <div ng-repeat="item in demo.fields">
+                <div class="control-group">
+                    <label class="control-label">{{item.label }} : </label>
+                    <div class="controls">
+                        <input type="text" dy-name="item.field" ng-model="demo.data[item.field]" ng-minlength="10"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        angular.module("app", [])
+                .controller("demoCtr", [function() {
+                    var vm = this;
+                    vm.data = {};
+
+                    vm.fields = [{
+                        "label": "age",
+                        "field": "age"
+                    }, {
+                        "label": "hight",
+                        "field": "hight"
+                    }];
+
+                    return vm;//可以有，也可以不用写
+
+                }])
+                .directive("dyName", [
+                    function() {
+                        return {
+                            require: "ngModel",
+                            link: function(scope, elm, iAttrs, ngModelCtr) {
+                                ngModelCtr.$name = scope.$eval(iAttrs.dyName);
+                                console.log(ngModelCtr);
+                                var formController = elm.controller('form') || {
+                                            $addControl: angular.noop
+                                        };
+                                formController.$addControl(ngModelCtr);
+                                scope.$on('$destroy', function() {
+                                    formController.$removeControl(ngModelCtr);
+                                });
+                            }
+                        };
+                    }
+                ]);
+    </script>
+</html>

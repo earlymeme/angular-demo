@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="parentController">
+            <input type='text' placeholder="input {{$index + 1}}" ng-model='ctrl.someModel' duplicate="5" />   
+        </div>
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('parentController', ['$scope', '$window', function($scope, $window) {
+               
+            }]);
+        
+            /*把页面中指令的内容，作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('duplicate', function(){
+              return {
+                transclude: 'element',
+                priority: 1000,
+                link: function(scope, el, attrs, ctrl, transclude){
+                  var times = parseInt(attrs.duplicate, 10);
+                  var previous = el;
+                  var childScope;
+
+                  for(var i = 0; i < times; i += 1){
+                    childScope = scope.$new();
+                    childScope.$index = i;
+
+                    transclude(childScope, function(clone){
+                      previous.after(clone);
+                      previous = clone;
+                    });
+                  }
+                }
+              }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular.js"></script>
+        <style>
+            .item {
+
+            }
+        </style>
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+            <pane title="{{title}}">{{text}}</pane>
+            <span>{{text}}</span>
+            <select ng-model="student" name="student" ng-options="s.id as s.name for s in students">
+                <option value="">全部</option>
+            </select>
+            <div class="item" square started="{{started}}" started1="started" started2="started" started3="started">Dish</div>
+            <select name="stu" ng-model="stu">
+                <option value="1" >1</option>
+                <option value="2" squ selected="selected1" age1="age">2</option>
+            </select>
+        </div>
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest', ['$scope', '$timeout',
+                function($scope, $timeout) {
+                    $scope.title = "zhujiacnhen";
+                    $scope.text = "test";
+                    $scope.started = false;
+                    $scope.age = 18;
+                    $scope.students = [{id: 1, name: 'zjc'}, {id: 2, name: 'lhc'}];
+                    $timeout(function() {
+                        $scope.started = true;
+                        $scope.selected1 = true;
+                    },2000);
+                }
+            ]);
+
+            /*把页面中指令的内容（子元素），作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('pane', function() {
+                return {
+                    restrict: 'E',
+                    transclude: true,
+                    scope: {title: '@'},
+                    template: '<div style="border: 1px solid black;">' +
+                    '<div style="background-color: gray">                        {{title}}</div>' +
+                    '<div ng-transclude></div>' +
+                    '</div>',
+                    link:function($scope) {
+                        debugger
+                    }
+                };
+            }).directive('squ',
+                    function($parse, $window, $timeout) {
+                        return {
+                            scope: {
+                                selected:'@',
+                                age1:'<'
+                            },
+                            link: function(scope, element, attr) {
+                                attr.$observe('selected', function(newValue) {
+                                    if (newValue) {
+                                        console.log('squ'+newValue);
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    .directive('square',
+                    function($parse, $window, $timeout) {
+                        return {
+                            scope: {
+                                started: "@",
+                                started1: '=',
+                                started2:'<',
+                                started3:'@'
+                            },
+                            link: function(scope, element, attr) {
+                                /*使用隔离的scope时
+                                 * @{{父scope}} 可以使用$watch和$observe('属性名string')监听，
+                                 * =父scope 使用$watch监听
+                                 * $watch 不能监听attr中属性的值带有{{}}的属性，
+                                 * 例如这里的attr.started,因为在执行$watch时，它的值已经被$interpolate过了，解析成具体的值了
+                                 * */
+                                scope.$watch('started1', function(newValue) {
+                                    console.log(newValue);
+                                    /*可以监听到*/
+                                });
+                                attr.$observe('started1', function(newValue) {
+                                    /*监听不到*/
+                                });
+                                scope.$watch(attr.started, function(newValue) {
+                                    /*监听不到，其实是$watch('',...)*/
+                                });
+
+                                scope.$watch(attr.started1, function(newValue) {
+                                    /*可以监听到*/
+
+                                });
+                                /*1*/
+                                /*<===============>1,2这两个是等价的*/
+                                debugger
+                                scope.$watch('started', function(newValue) {
+                                    console.log(newValue);
+                                    /*可以监听到*/
+                                });
+                                /*2*/
+
+                                attr.$observe('started', function(newValue) {
+                                    if (newValue) {
+                                        console.log(newValue);
+                                    }
+                                });
+                            }
+                        }
+                    });
+        </script>
+    </body>
+</html>

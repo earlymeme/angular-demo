@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html ng-app="Demo">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/zepto.min.js"></script>
+        <script src="lib/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller='parentctrl'>
+            <div ng-controller='sonctrl'>
+                <my-site site="http://www.cnblogs.com/cunjieliu">
+                    <div>雷锋叔叔的博客</div>
+                </my-site>
+            </div>
+        </div>
+        <script>
+            var app = angular.module('Demo', []);
+            app.controller('sonctrl', function($scope) {
+                $scope.title = 'hello son';
+            });
+            app.controller('parentctrl', function($scope) {
+                $scope.title = 'hello parent';
+            });
+            app.directive('mySite', function() {
+                return {
+                    restrict: 'EA',
+                    transclude: true,
+                    controller: function($scope, $element, $attrs, $transclude, $log) {
+                        var a = $transclude($scope,function(clone) {
+                            console.log(clone);
+                        });
+                        $element.append(a);
+                        $log.info($scope.title);
+                        $log.info($scope.$parent.title);
+                    },
+                    link:function(scope,element,attr) {
+                        console.log(scope);
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>AngularJS</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body>
+        <div ng-app="myApp">
+            <div ng-controller="MyCtrl">
+                {{hellos}}
+            </div>
+        </div>
+        <script>
+            var myApp = angular.module('myApp', []);
+
+            //service style, probably the simplest one
+            myApp.service('helloWorldFromService', function() {
+                this.sayHello = function() {
+                    return "Hello, World!"
+                };
+            });
+
+            //factory style, more involved but more sophisticated
+            myApp.factory('helloWorldFromFactory', function() {
+                return {
+                    sayHello: function() {
+                        return "Hello, World!"
+                    }
+                };
+            });
+
+            //provider style, full blown, configurable version
+            myApp.provider('helloWorld', function() {
+
+                this.name = 'Default';
+
+                this.$get = function() {
+                    var name = this.name;
+                    return {
+                        sayHello: function() {
+                            return "Hello, " + name + "!"
+                        }
+                    }
+                };
+
+                this.setName = function(name) {
+                    this.name = name;
+                };
+            }).provider('user', {
+                $get: function() {
+                    return 'Richard Feynman';
+                }
+            }).provider('Logger', [function() {
+                var isEnabled = true;
+                this.enabled = function(_isEnabled) {
+                    isEnabled = !!_isEnabled;
+                };
+
+                // injected as a dependency
+                this.$get = ['user', function(user) {
+                    return user + ' Logger';
+                }];
+            }]);
+
+            //hey, we can configure a provider!
+            myApp.config(function(helloWorldProvider) {
+                helloWorldProvider.setName('World');
+            }).controller('MyCtrl', MyCtrl);
+
+            function MyCtrl($scope, helloWorld, helloWorldFromFactory, helloWorldFromService, user, Logger) {
+
+                $scope.hellos = [
+                    helloWorld.sayHello(),
+                    helloWorldFromFactory.sayHello(),
+                    helloWorldFromService.sayHello(),
+                    user,
+                    Logger
+                ];
+            }
+        </script>
+    </body>
+
+</html>
+
+

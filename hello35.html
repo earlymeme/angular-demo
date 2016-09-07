@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="eventtest">
+            <my-event ng-hide="dialogIsHidden" on-click="hideDialog()">  
+            <span>Check out the contents, {{name}}!  </span>
+            </my-event>  
+        </div>  
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('eventtest',['$scope','$timeout',  
+              function($scope, $timeout) {  
+                  $scope.name = 'Tobias';  
+                  $scope.hideDialog = function () {  
+                      $scope.dialogIsHidden = true;  
+                      $timeout(function () {  
+                          $scope.dialogIsHidden = false;  
+                      }, 2000);  
+                  };  
+              }  
+          ]);
+        
+            /*把页面中指令的内容(子元素)，作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('myEvent', function() {  
+                return {  
+                    restrict: 'E', 
+                    // replace:true, 
+                    transclude: true,  
+                    scope: {  
+                        'close': '&onClick'     //根html中的on-click="hideDialog()"有关联关系  
+                    },  
+                    template: '<div> <a href ng-click="close()">×</a><div ng-transclude></div></div> '  
+                };  
+            });
+        </script>
+    </body>
+</html>

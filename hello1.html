@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="app" ng-jq="$">
+    <head>
+        <meta charset=utf-8/>
+        <title>JS Bin</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body ng-controller="MainCtrl">
+        <foo name="Angular Tips"></foo>
+        <script>
+            app = angular.module('app', []);
+
+            app.controller("MainCtrl", function($scope) {
+                console.log($scope);
+            });
+
+            app.controller("fooCtrl", [
+
+                '$scope','greeting',function($scope,greeting) {
+                $scope.name = "from the directive controller";
+                console.log(greeting);
+            }]);
+
+            app.directive("foo", function() {
+                return {
+                    restrict: 'E',
+                    replace: true,
+                    template: '<div>Hello, {{name}}</div>',
+                    controller:'fooCtrl'
+                    /*controller: function($scope, $element, $attrs) {
+                        $scope.name = 'form s';
+                    }*/
+                };
+            }).provider('greeting', {
+                ehe:function(){
+                        console.log('ehe')
+                },
+             $get: function() { 
+
+            return 'Hi ' + 'user'; 
+        } 
+    });
+
+            app.config(function($provide) {
+                $provide.decorator('fooDirective', function($delegate, $controller) {
+                    var directive = $delegate[0];
+debugger
+                    var controllerName = directive.controller;
+                    directive.controller = function($scope, $timeout) {
+                        var controller = $controller(controllerName, {$scope: $scope});
+//                        var controller = controllerName($scope);
+
+                        $timeout(function() {
+                            $scope.name = "from the decorator now";
+                        }, 3000);
+
+                        return controller;
+                    };
+
+                    return $delegate;
+                });
+                $provide.decorator('greeting', function($delegate) {
+                 $delegate.warn = function(){
+
+                }; 
+                return $delegate; });;
+            });
+        </script>
+    </body>
+</html>

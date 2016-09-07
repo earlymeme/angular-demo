@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="testapp" ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="parentController">
+            <button-bar name1="nm1">
+                <button class="primary" ng-click="onPrimary1Click()">{{primary1Label}}</button>
+                <button class="primary">Primary2</button>
+            </button-bar>
+        </div>
+        <script>
+            var testapp = angular.module('testapp', []);
+            testapp.controller('parentController', ['$scope', '$window', function($scope, $window) {
+                console.log('parentController scope id = ', $scope.$id);
+                $scope.primary1Label = 'Prime1';
+
+                $scope.onPrimary1Click = function() {
+                    $window.alert('Primary1 clicked');
+                };
+                $scope.nm = 'lhc';
+                $scope.nm1 = 'lhc1';
+            }]);
+            testapp.directive('primary', function() {
+                return {
+                    restrict: 'C',
+                    link: function(scope, element, attrs) {
+                        element.addClass('btn btn-primary');
+                    }
+                }
+            });
+            /*把页面中指令的内容，作为对应指令模板的ng-transclude的子元素*/
+            testapp.directive('buttonBar', function() {
+                return {
+                    restrict: 'EA',
+                    template: '<div class="span4 well clearfix" name="nm"><div class="pull-right" ng-transclude></div></div>',
+                    replace: true,
+                    transclude: true,
+                    scope: {
+                        name: '<',
+                        name1: '<'
+                    },
+                    link: function(scope, elem, attrs, ctrl, $transclude) {
+                        $transclude(scope, function(clone) {
+                            debugger
+                        });
+                    }
+                };
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+
+        <div ng-app="myApp" ng-controller="myCtrl">
+
+            <h4>姓氏为 {{lastname}} 家族成员:</h4>
+
+            <ul>
+                <li ng-repeat="x in names">{{x}} {{lastname}}
+            </ul>
+
+            <div my-attr="obj.name" my-directive>testing</div>
+            <bilingual-button></bilingual-button>
+        </div>
+
+        <script>
+            var app = angular.module('myApp', []);
+
+            app.controller('myCtrl', function($scope, $rootScope, $element, bilingualButtonConfig) {
+                $scope.names = ["Emil", "Tobias", "Linus"];
+                $rootScope.lastname = "Refsnes";
+                $scope.obj = {
+                    name: 'zjc'
+                };
+                console.log($element.find('ul').length);
+                bilingualButtonConfig.setLocale('ch');
+            }).directive('myDirective', function($log, $parse) {
+                return function(scope, elem, attrs) {
+                    //解析"my-attr属性值到一个函数中"
+                    var model = $parse(attrs.myAttr);
+                    //model现在是一个函数，可以调用它来获取表达式的值
+                    //下面这行代码将会输出作用域中obj.name的值
+                    $log.log(model(scope));
+
+                    elem.bind('click', function() {
+                        //'model.assign'也是一个函数，它用来更新表达式的值
+                        model.assign(scope, 'New name');
+                        $log.log(model(scope));
+                        scope.$apply();
+                    })
+                }
+            }).provider('bilingualButtonConfig', function () {
+                        this.setLocale = function (locale) {
+                            this.locale = locale;
+                        };
+
+                        this.$get = function () {
+                            /*return {
+                                hehe:'zjc'
+                            };*/
+                            return this;
+                        };
+
+                    })
+                    .directive('bilingualButton', function () {
+                        return {
+                            scope:true,
+                            template: '<button>{{greeting}}</button>',
+                            controller: function ($scope, bilingualButtonConfig) {
+                                debugger
+                                if (bilingualButtonConfig.locale === 'ch') {
+                                    $scope.greeting = '你好';
+                                } else {
+                                    $scope.greeting = 'Hello World';
+                                }
+                            }
+                        };
+
+                    }).run(function(bilingualButtonConfig) {
+                        console.log(bilingualButtonConfig);
+                    });
+        </script>

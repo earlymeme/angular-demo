@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" ng-app='PonyDeli'>
+
+    <head>
+        <meta charset="utf-8" />
+        <title>My AngularJS App</title>
+        <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+
+    <body>
+        <div ng-controller='foodCtrl'>
+            <p note='You just bought some {{type}}'></p>
+            <p note-equiv='These {{type}} are equivalent.'></p>
+            <ul ng-repeat="t in teachers">
+                <li ng-click="clickMe(t.id)">{{t.name}}</li>
+            </ul>
+        </div>
+
+        <script type="text/javascript">
+            var deli = angular.module('PonyDeli', []);
+
+            deli.controller('foodCtrl', function ($scope) {
+                $scope.type = 'vegetables';
+                $scope.teachers = [{name:'zjc',id:1},{name:'zjc12',id:2}];
+                $scope.clickMe = function(id) {
+                    console.log(id);
+                }
+            });
+
+            deli.directive('note', function () {
+                return {
+                    template: '{{note}}',
+                    scope: {
+                        note: '@'
+                    }
+                };
+            });
+
+            // this is what the `note` directive above ends up doing
+            deli.directive('noteEquiv', function () {
+                return {
+                    template: '{{note}}',
+                    scope: {},
+                    link: function (scope, element, attrs) {
+                        // https://github.com/angular/angular.js/blob/caed2dfe4feeac5d19ecea2dbb1456b7fde21e6d/src/ng/compile.js#L1417-L1419
+                        attrs.$observe('noteEquiv', function (value) {
+                            scope.note = value;
+                        });
+                    }
+                };
+            });
+        </script>
+    </body>
+
+</html>

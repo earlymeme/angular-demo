@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html ng-app='PonyDeli' ng-jq="$">
+    <head>
+        <meta charset="utf-8">
+        <script src="lib/jquery-1.11.3.js"></script>
+        <script src="lib/angular/angular.js"></script>
+
+    </head>
+    <body>
+        <div ng-controller="nameController">
+            <direct-parent>
+            <!-- name属性的值的scope，就是 nameController所在的scope-->
+                <direct get-title="title" name="name1" age="age1" get-content="contents"></direct>
+            </direct-parent>
+            <div ng-class="{true: 'active', false: 'inactive'}[isActive]">
+            </div>
+        </div>
+        <script>
+            var deli = angular.module('PonyDeli', []);
+
+            deli.directive("directParent", function() {
+
+                return {
+                    scope: {},
+                    controller: function($scope) {
+                        $scope.name = 'zjc';
+                        this.addList = function() {
+                            console.log('ss');
+                        }
+                        this.getThis = function() {
+                            return this;
+                        }
+                    }
+                }
+            }).directive("direct", function() {
+
+                        return {
+
+                            restrict: 'ECMA',
+
+                            template: '<div>{{ title }}</div>' + '<div><ul><li ng-repeat="x in          contents">{{ x.text }}</li></ul></div>',
+                            require: '^directParent',
+
+                            scope: {
+                                name:'@',
+                                age:'=',
+                                getTitle: '&',
+                                getContent: '&'
+                            },
+                            controller: function($scope, $element, $attrs, $transclude) {
+                                $scope.title = $scope.getTitle();     //调用无参函数
+                                $scope.contents = $scope.getContent();    //调用无参函数
+                            },
+                            link: function(scope, element, attrs, direct1) {
+                                debugger
+                            }
+                        }
+                    })
+
+
+                    .controller("nameController", function($scope, random) {
+
+                        $scope.title = "标题";
+
+                        $scope.contents = [{text: 1234}, {text: 5678}];
+                        console.log(random(123));
+                        $scope.isActive = true;
+                        var name1 = '';
+                        var age1 = 18;
+                    }).factory('random', function() {
+                function random(n) {
+
+                    var rnd = "";
+
+                    for (var i = 0; i < n; i++) {
+                        rnd += Math.floor(Math.random() * 10);
+                    }
+
+                    return rnd;
+                }
+
+                return random;
+            });
+
+
+        </script>
+    </body>
+</html>

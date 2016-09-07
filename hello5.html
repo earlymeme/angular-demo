@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset=utf-8/>
+        <title>JS Bin</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body>
+        <div ng-controller="myController" class="expressions">
+            <dumb-password></dumb-password>
+        </div>
+        <script>
+            var app = angular.module("app", [])
+
+
+            app.directive("dumbPassword", function () {
+                var validElement = angular.element('<div>{{ model.input }}</div>');
+                return {
+                    restrict: "E",
+                    replace: true,
+                    template: "<div id='d'> <input type=\"text\" ng-model=\"model.input\"> </div>",
+                    compile: function (tElem) {
+                        tElem.append(validElement);
+
+                        return function(scope) {
+                            scope.$watch("model.input", function(value) {
+                                if (value === "password") {
+                                    validElement.toggleClass("alert-box alert");
+                                }
+                            });
+                        }
+                    },
+                    link: function (scope, element) {
+                        scope.$watch("model.input", function (value) {
+                            if(value === "password") {
+                                element.children(1).toggleClass("alert-box alert");
+                            }
+                        });
+                    }
+                };
+            }).controller('myController',['$scope', function($scope) {
+                $scope.model = {
+                    input:''
+                }
+            }]);
+
+
+        </script>
+    </body>
+</html>
