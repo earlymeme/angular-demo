@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset=utf-8/>
+        <title>JS Bin</title>
+        <script src="lib/angular/angular.js"></script>
+    </head>
+    <body ng-controller="MainCtrl">
+        <ul ng-controller="testCtrl">
+            <li ng-repeat="value in list" ng-style="getStyles($index)">
+                {{value}}
+            </li>
+        </ul>
+        <script>
+            angular.module("app", []).controller("MainCtrl", function($scope) {
+                $scope.list = [1,2];
+                $scope.getStyles = function(index) {
+                    console.log('getting styles for index ' + index);
+                    return {
+                        color: 'red'
+                    };
+                };
+            })
+        </script>
+    </body>
+</html>
